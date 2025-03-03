@@ -1,3 +1,4 @@
+__pycache__
 dist/
 imports/*
 !imports/__init__.py
