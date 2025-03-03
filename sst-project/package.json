@@ -1,0 +1,20 @@
+{
+  "name": "sstproj",
+  "version": "0.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "sst dev",
+    "deploy": "sst deploy",
+    "remove": "sst remove"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "sst": "^3"
+  }
+}
