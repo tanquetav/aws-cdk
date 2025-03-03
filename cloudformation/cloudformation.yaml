@@ -1,0 +1,428 @@
+Resources:
+  MyFunctionServiceRole3C357FF2:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CdkProjectStack/MyFunction/ServiceRole/Resource
+  MyFunction3BAA72D1:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 07b778d5c2958fd58e2d96bd3d248b8ad12115d8317b6c5968e9ae5ce4f77ee4.zip
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: bucket1D4C77784
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - MyFunctionServiceRole3C357FF2
+          - Arn
+      Runtime: nodejs18.x
+    DependsOn:
+      - MyFunctionServiceRole3C357FF2
+    Metadata:
+      aws:cdk:path: CdkProjectStack/MyFunction/Resource
+      aws:asset:path: asset.07b778d5c2958fd58e2d96bd3d248b8ad12115d8317b6c5968e9ae5ce4f77ee4
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  MyFunctioninlinePolicyAddedToExecutionRole0D3F1F7CB:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:Get*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - bucket1D4C77784
+                      - Arn
+                  - "*"
+        Version: "2012-10-17"
+      PolicyName: MyFunctioninlinePolicyAddedToExecutionRole0D3F1F7CB
+      Roles:
+        - Ref: MyFunctionServiceRole3C357FF2
+    Metadata:
+      aws:cdk:path: CdkProjectStack/MyFunction/inlinePolicyAddedToExecutionRole-0/Resource
+  MyFunctioninlinePolicyAddedToExecutionRole1EF124B47:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:Get*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - bucket231DE1803
+                      - Arn
+                  - "*"
+        Version: "2012-10-17"
+      PolicyName: MyFunctioninlinePolicyAddedToExecutionRole1EF124B47
+      Roles:
+        - Ref: MyFunctionServiceRole3C357FF2
+    Metadata:
+      aws:cdk:path: CdkProjectStack/MyFunction/inlinePolicyAddedToExecutionRole-1/Resource
+  bucket1D4C77784:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CdkProjectStack/bucket1/Resource
+  bucket231DE1803:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CdkProjectStack/bucket2/Resource
+  apiC8550315:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: api
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Resource
+  apiDeployment149F12943a1481c1b042619e0b3d5ff89ebe0208:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      Description: Automatically created by the RestApi construct
+      RestApiId:
+        Ref: apiC8550315
+    DependsOn:
+      - apiproxyANY7F13F09C
+      - apiproxy4EA44110
+      - apiANYB3DF8C3C
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Deployment/Resource
+  apiDeploymentStageprod896C8101:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId:
+        Ref: apiDeployment149F12943a1481c1b042619e0b3d5ff89ebe0208
+      RestApiId:
+        Ref: apiC8550315
+      StageName: prod
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/DeploymentStage.prod/Resource
+  apiproxy4EA44110:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - apiC8550315
+          - RootResourceId
+      PathPart: "{proxy+}"
+      RestApiId:
+        Ref: apiC8550315
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/{proxy+}/Resource
+  apiproxyANYApiPermissionCdkProjectStackapi5151FDA0ANYproxyCB491AA0:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - MyFunction3BAA72D1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: apiC8550315
+            - /
+            - Ref: apiDeploymentStageprod896C8101
+            - /*/*
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/{proxy+}/ANY/ApiPermission.CdkProjectStackapi5151FDA0.ANY..{proxy+}
+  apiproxyANYApiPermissionTestCdkProjectStackapi5151FDA0ANYproxyC494BA57:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - MyFunction3BAA72D1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: apiC8550315
+            - /test-invoke-stage/*/*
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/{proxy+}/ANY/ApiPermission.Test.CdkProjectStackapi5151FDA0.ANY..{proxy+}
+  apiproxyANY7F13F09C:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - MyFunction3BAA72D1
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: apiproxy4EA44110
+      RestApiId:
+        Ref: apiC8550315
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/{proxy+}/ANY/Resource
+  apiANYApiPermissionCdkProjectStackapi5151FDA0ANYBBB984D0:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - MyFunction3BAA72D1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: apiC8550315
+            - /
+            - Ref: apiDeploymentStageprod896C8101
+            - /*/
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/ANY/ApiPermission.CdkProjectStackapi5151FDA0.ANY..
+  apiANYApiPermissionTestCdkProjectStackapi5151FDA0ANY90F13BE3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - MyFunction3BAA72D1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: apiC8550315
+            - /test-invoke-stage/*/
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/ANY/ApiPermission.Test.CdkProjectStackapi5151FDA0.ANY..
+  apiANYB3DF8C3C:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - MyFunction3BAA72D1
+                  - Arn
+              - /invocations
+      ResourceId:
+        Fn::GetAtt:
+          - apiC8550315
+          - RootResourceId
+      RestApiId:
+        Ref: apiC8550315
+    Metadata:
+      aws:cdk:path: CdkProjectStack/api/Default/ANY/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/7VUyW7bMBD9luhY0GwSXwrf7C6AgRQxnNwMI5iQE5k1RQoklVQg9O/lItlSjRyKIgdBmu3Nmzdj39KbL9f0+gre7Izx40yKZ+ofHLAjCa4nL6F65kD9j0YxJ7Ta+YJpjsWi+FSQ4gCKSzS9ZRrlRJVjHfEFcP5dvQqjVYXKFYtdysrPvtuTry9qgI3fGzSVsDZYHRFQUb/VEkM/sLapkK/aYuGL2gjFRA1yyZhuImoCzDmxYJnweg5FBQpK5BstBRNoAwc/8bVL0+fuE2MXJj+slRQKczyz/rBgEiHSJtkf6FkHDqNgdizkw8i782O2jzrWX3S7cH8IbuKfqXfEzp/CHtBZuoyvYFO/atgR3Qos7vYkG2FGg5V+BTloUXC0zug2kXo3lnpliI5ALcrA/A1a6u/SjW5D3rIWAZ3jCzTSrZXD0sDpHKbnGltN7LyKDEK+YS11G3VJeJYZUY+AQvfh5tGBUOf0ibiP+k6XgoFc85G6/+JPpM7oJKyrxERpcI3IpyAJI+jGMEyaxyWRjdG/28EdimswePrlvCtWH/iJ7qD5fZr+PNwIouee86Z33bckOZb2nj3DPpyrh7rkEBcs9F+N/xMh8coFXXeSKsuUjjZqKFQZ0+4bVzfh1DZtSFef5/RmTm+vflkhZv0/Hd3m9x/WGCSoRQUAAA==
+    Metadata:
+      aws:cdk:path: CdkProjectStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  apiEndpoint9349E63C:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: apiC8550315
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: apiDeploymentStageprod896C8101
+          - /
+  ApiUrl:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: apiC8550315
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: apiDeploymentStageprod896C8101
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+
